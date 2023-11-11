@@ -1,8 +1,9 @@
-import * as PIXI from 'pixi.js'
+import { Game } from './Game'
 
-const app = new PIXI.Application<HTMLCanvasElement>({
-  background: '#375b63',
-  resizeTo: window
-})
+const init = (): void => {
+  const game = new Game()
 
-document.body.appendChild(app.view)
+  document.body.appendChild(game.view)
+}
+
+init()

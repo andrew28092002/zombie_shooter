@@ -10,8 +10,8 @@
     "build:prod": "webpack --mode=production --node-env=production",
     "watch": "webpack --watch",
     "start": "webpack serve",
-    "lint": "npx eslint src --ext .ts",
-    "format": "npx eslint src --ext .ts --fix"
+    "lint": "npx eslint src",
+    "format": "npx eslint src --fix"
   },
   "author": "",
   "license": "ISC",
