@@ -81,10 +81,14 @@ export class Zombie {
       const dx = Math.cos(angle)
       const dy = Math.sin(angle)
 
-      if (!this.checkCollision(zombie, player.player)) {
-        // Move the zombie towards the player
-        zombie.position.x += dx * 5
-        zombie.position.y += dy * 5
+      // Move the zombie towards the player
+      zombie.position.x += dx * 5
+      zombie.position.y += dy * 5
+
+      if (this.checkCollision(zombie, player.player)) {
+        this.zombies = this.zombies.filter(z => z !== zombie)
+        console.log(this.zombies)
+        zombie.destroy()
       }
     })
     if (!this.canCreate) {
