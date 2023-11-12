@@ -64,12 +64,12 @@ export class Zombie {
     this.zombies.push(zombie)
   }
 
-  checkCollision = (zombie: PIXI.Graphics, player: PIXI.Sprite): boolean => {
+  checkCollision = (first: PIXI.Graphics | PIXI.Sprite, second: PIXI.Sprite | PIXI.Graphics): boolean => {
     return (
-      zombie.x < player.x + player.width &&
-        zombie.x + zombie.width > player.x &&
-        zombie.y < player.y + player.height &&
-        zombie.y + zombie.height > player.y
+      first.x < second.x + second.width &&
+        first.x + first.width > second.x &&
+        first.y < second.y + second.height &&
+        first.y + first.height > second.y
     )
   }
 
