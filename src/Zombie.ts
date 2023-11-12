@@ -1,28 +1,29 @@
 import * as PIXI from 'pixi.js'
 import { type Player } from './Player'
 
-const DEFAULT_ZOMBIE_SPEED = 5
+const DEFAULT_ZOMBIE_SPEED = 20
 const DEFAULT_ENEMY_RADIUS = 16
-const DEFAULT_MAX_COUNT = 100
 
 export interface ZombieParams {
   enemyRadius: number
   speed: number
-  maxCount: number
 }
 
 export class Zombie {
   params: ZombieParams
-  zombies: PIXI.Graphics[] = []
+  player: Player
+  zombie: PIXI.Graphics
   canCreate: boolean = true
 
-  constructor (public app: PIXI.Application<HTMLCanvasElement>, params: Partial<ZombieParams>) {
-    const { speed, enemyRadius, maxCount } = params
+  constructor (public app: PIXI.Application<HTMLCanvasElement>, player: Player, params: Partial<ZombieParams>) {
+    const { speed, enemyRadius } = params
     this.params = {
       speed: speed ?? DEFAULT_ZOMBIE_SPEED,
-      enemyRadius: enemyRadius ?? DEFAULT_ENEMY_RADIUS,
-      maxCount: maxCount ?? DEFAULT_MAX_COUNT
+      enemyRadius: enemyRadius ?? DEFAULT_ENEMY_RADIUS
     }
+    this.player = player
+    this.zombie = this.createZombie()
+    this.app.stage.addChild(this.zombie)
   }
 
   getRandomSpawnPoint = (): PIXI.Point => {
@@ -56,15 +57,15 @@ export class Zombie {
     return spawnPoint
   }
 
-  createZombie = (): void => {
+  createZombie = (): PIXI.Graphics => {
     const { x, y } = this.getRandomSpawnPoint()
     const zombie = new PIXI.Graphics()
     zombie.position.set(x, y)
     zombie.beginFill('0xff0000', 1)
     zombie.drawCircle(0, 0, this.params.enemyRadius)
     zombie.endFill()
-    this.app.stage.addChild(zombie)
-    this.zombies.push(zombie)
+
+    return zombie
   }
 
   checkCollision = (first: PIXI.Graphics | PIXI.Sprite, second: PIXI.Sprite | PIXI.Graphics): boolean => {
@@ -76,47 +77,34 @@ export class Zombie {
     )
   }
 
-  handleZombieActivity = (player: Player) => (): void => {
-    this.zombies.forEach(zombie => {
-      const angle = Math.atan2(player.position.y - zombie.position.y, player.position.x - zombie.position.x)
+  update = (player: Player, zombies: PIXI.Graphics[]): void => {
+    const zombie = this.zombie
+    const angle = Math.atan2(player.position.y - zombie.position.y, player.position.x - zombie.position.x)
 
-      // Calculate the movement vector
-      let dx = Math.cos(angle)
-      let dy = Math.sin(angle)
+    // Calculate the movement vector
+    let dx = Math.cos(angle)
+    let dy = Math.sin(angle)
 
-      this.zombies.forEach(otherZombie => {
-        if (otherZombie !== zombie) {
-          if (this.checkCollision(zombie, otherZombie)) {
-            const avoidAngle = Math.atan2(zombie.position.y - otherZombie.position.y, zombie.position.x - otherZombie.position.x)
-            dx += Math.cos(avoidAngle)
-            dy += Math.sin(avoidAngle)
-          }
+    zombies.forEach(otherZombie => {
+      if (otherZombie !== zombie) {
+        if (this.checkCollision(zombie, otherZombie)) {
+          const avoidAngle = Math.atan2(zombie.position.y - otherZombie.position.y, zombie.position.x - otherZombie.position.x)
+          dx += Math.cos(avoidAngle)
+          dy += Math.sin(avoidAngle)
         }
-      })
-
-      // Normalize the movement vector
-      const length = Math.sqrt(dx * dx + dy * dy)
-      if (length !== 0) {
-        dx /= length
-        dy /= length
-      }
-
-      if (!this.checkCollision(zombie, player.player)) {
-        // this.zombies = this.zombies.filter(z => z !== zombie)
-        // zombie.destroy()
-        // Move the zombie towards the player
-        zombie.position.x += dx * 5
-        zombie.position.y += dy * 5
       }
     })
-    if (!this.canCreate && this.zombies.length === this.params.maxCount) {
-      return
+
+    // Normalize the movement vector
+    const length = Math.sqrt(dx * dx + dy * dy)
+    if (length !== 0) {
+      dx /= length
+      dy /= length
     }
 
-    this.createZombie()
-    this.canCreate = false
-    setTimeout(() => {
-      this.canCreate = true
-    }, 3000)
+    if (!this.checkCollision(zombie, player.player)) {
+      zombie.position.x += dx * 5
+      zombie.position.y += dy * 5
+    }
   }
 }

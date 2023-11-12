@@ -25,7 +25,7 @@ export class Player {
     return person
   }
 
-  handlePlayerActivity = (): void => {
+  update = (): void => {
     const cursorPosition = this.app.renderer.events.pointer.global
 
     const angle = Math.atan2(cursorPosition.y - this.player.position.y, cursorPosition.x - this.player.position.x) + Math.PI / 2
