@@ -1,11 +1,13 @@
 import { type Application } from 'pixi.js'
 import * as PIXI from 'pixi.js'
 import { Player } from './Player'
+import { Zombie } from './Zombie'
 
 export class Game {
   app: Application<HTMLCanvasElement>
   view: HTMLCanvasElement
-  person!: PIXI.Sprite
+  player: Player
+  zombies: Zombie
   keys: Record<string, boolean> = {}
 
   constructor () {
@@ -16,11 +18,14 @@ export class Game {
       height: window.innerHeight
     })
     this.view = this.app.view
+    this.player = new Player(this.app, this.keys)
+    this.zombies = new Zombie(this.app, {})
     this.app.stage.eventMode = 'dynamic'
-    this.setup()
 
     window.addEventListener('keydown', this.handleKeyDown)
     window.addEventListener('keyup', this.handleKeyUp)
+
+    this.setup()
   }
 
   handleKeyDown = (event: KeyboardEvent): void => {
@@ -35,10 +40,7 @@ export class Game {
   }
 
   setup = (): void => {
-    this.setupPlayer()
-  }
-
-  setupPlayer = (): void => {
-    const player = new Player(this.app, this.keys)
+    this.app.ticker.add(this.player.handlePlayerActivity)
+    this.app.ticker.add(this.zombies.handleZombieActivity(this.player))
   }
 }

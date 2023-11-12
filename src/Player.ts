@@ -5,12 +5,15 @@ export class Player {
   player: PIXI.Sprite
   speed: number
 
+  get position (): PIXI.ObservablePoint<any> {
+    return this.player.position
+  }
+
   constructor (public app: Application<HTMLCanvasElement>, public keys: Record<string, boolean>, speed: number = 5) {
     this.player = this.initPlayer()
     this.speed = speed
 
     app.stage.addChild(this.player)
-    app.ticker.add(this.handlePlayerActivity)
   }
 
   initPlayer = (): PIXI.Sprite => {
