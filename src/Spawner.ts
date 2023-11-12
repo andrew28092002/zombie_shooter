@@ -3,9 +3,9 @@ import { type Player } from './Player'
 import { Zombie } from './Zombie'
 
 export interface SpawnerParams {
-  maxCount?: number
-  maxSpawns?: number
-  spawnInterval?: number
+  maxCount: number
+  maxSpawns: number
+  spawnInterval: number
 }
 
 const DEFAULT_MAX_COUNT = 1000
@@ -15,12 +15,12 @@ const DEFAULT_INTERVAL = 1000
 export class Spawner {
   app: PIXI.Application<HTMLCanvasElement>
   player: Player
-  params: Required<SpawnerParams>
+  params: SpawnerParams
   zombies: Zombie[] = []
   spawnsCount: number = 0
 
-  constructor (app: PIXI.Application<HTMLCanvasElement>, player: Player, params: SpawnerParams) {
-    this.params = { ...params, maxCount: params.maxCount ?? DEFAULT_MAX_COUNT, spawnInterval: params.spawnInterval ?? DEFAULT_INTERVAL, maxSpawns: params.maxSpawns ?? DEFAULT_MAX_SPAWNS }
+  constructor (app: PIXI.Application<HTMLCanvasElement>, player: Player, params: Partial<SpawnerParams>) {
+    this.params = { maxCount: params.maxCount ?? DEFAULT_MAX_COUNT, spawnInterval: params.spawnInterval ?? DEFAULT_INTERVAL, maxSpawns: params.maxSpawns ?? DEFAULT_MAX_SPAWNS }
     this.app = app
     this.player = player
     setInterval(() => { this.spawn() }, this.params.spawnInterval)
