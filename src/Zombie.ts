@@ -78,20 +78,35 @@ export class Zombie {
       const angle = Math.atan2(player.position.y - zombie.position.y, player.position.x - zombie.position.x)
 
       // Calculate the movement vector
-      const dx = Math.cos(angle)
-      const dy = Math.sin(angle)
+      let dx = Math.cos(angle)
+      let dy = Math.sin(angle)
 
-      // Move the zombie towards the player
-      zombie.position.x += dx * 5
-      zombie.position.y += dy * 5
+      this.zombies.forEach(otherZombie => {
+        if (otherZombie !== zombie) {
+          if (this.checkCollision(zombie, otherZombie)) {
+            const avoidAngle = Math.atan2(zombie.position.y - otherZombie.position.y, zombie.position.x - otherZombie.position.x)
+            dx += Math.cos(avoidAngle)
+            dy += Math.sin(avoidAngle)
+          }
+        }
+      })
 
-      if (this.checkCollision(zombie, player.player)) {
-        this.zombies = this.zombies.filter(z => z !== zombie)
-        console.log(this.zombies)
-        zombie.destroy()
+      // Normalize the movement vector
+      const length = Math.sqrt(dx * dx + dy * dy)
+      if (length !== 0) {
+        dx /= length
+        dy /= length
+      }
+
+      if (!this.checkCollision(zombie, player.player)) {
+        // this.zombies = this.zombies.filter(z => z !== zombie)
+        // zombie.destroy()
+        // Move the zombie towards the player
+        zombie.position.x += dx * 5
+        zombie.position.y += dy * 5
       }
     })
-    if (!this.canCreate) {
+    if (!this.canCreate && this.zombies.length === 100) {
       return
     }
 
