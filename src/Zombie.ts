@@ -3,10 +3,12 @@ import { type Player } from './Player'
 
 const DEFAULT_ZOMBIE_SPEED = 5
 const DEFAULT_ENEMY_RADIUS = 16
+const DEFAULT_MAX_COUNT = 100
 
 export interface ZombieParams {
   enemyRadius: number
   speed: number
+  maxCount: number
 }
 
 export class Zombie {
@@ -15,10 +17,11 @@ export class Zombie {
   canCreate: boolean = true
 
   constructor (public app: PIXI.Application<HTMLCanvasElement>, params: Partial<ZombieParams>) {
-    const { speed, enemyRadius } = params
+    const { speed, enemyRadius, maxCount } = params
     this.params = {
       speed: speed ?? DEFAULT_ZOMBIE_SPEED,
-      enemyRadius: enemyRadius ?? DEFAULT_ENEMY_RADIUS
+      enemyRadius: enemyRadius ?? DEFAULT_ENEMY_RADIUS,
+      maxCount: maxCount ?? DEFAULT_MAX_COUNT
     }
   }
 
@@ -106,7 +109,7 @@ export class Zombie {
         zombie.position.y += dy * 5
       }
     })
-    if (!this.canCreate && this.zombies.length === 100) {
+    if (!this.canCreate && this.zombies.length === this.params.maxCount) {
       return
     }
 
