@@ -26,10 +26,6 @@ export class Spawner {
     setInterval(() => { this.spawn() }, this.params.spawnInterval)
   }
 
-  get zombiesGraphic (): PIXI.Graphics[] {
-    return this.zombies.map(z => z.zombie)
-  }
-
   spawn = (): void => {
     if (this.spawnsCount < this.params.maxSpawns) {
       this.spawnsCount += 1
@@ -39,6 +35,6 @@ export class Spawner {
   }
 
   update = (player: Player): void => {
-    this.zombies.forEach(z => { z.update(player, this.zombiesGraphic) })
+    this.zombies.forEach(z => { z.update(player, this.zombies) })
   }
 }

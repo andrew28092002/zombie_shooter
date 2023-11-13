@@ -12,7 +12,7 @@ export interface ZombieParams {
 export class Zombie {
   params: ZombieParams
   player: Player
-  zombie: PIXI.Graphics
+  element: PIXI.Graphics
   canCreate: boolean = true
 
   constructor (public app: PIXI.Application<HTMLCanvasElement>, player: Player, params: Partial<ZombieParams>) {
@@ -22,8 +22,8 @@ export class Zombie {
       enemyRadius: enemyRadius ?? DEFAULT_ENEMY_RADIUS
     }
     this.player = player
-    this.zombie = this.createZombie()
-    this.app.stage.addChild(this.zombie)
+    this.element = this.createZombie()
+    this.app.stage.addChild(this.element)
   }
 
   getRandomSpawnPoint = (): PIXI.Point => {
@@ -77,8 +77,13 @@ export class Zombie {
     )
   }
 
-  update = (player: Player, zombies: PIXI.Graphics[]): void => {
-    const zombie = this.zombie
+  destroy = (): void => {
+    this.element.destroy()
+  }
+
+  update = (player: Player, zombies: Zombie[]): void => {
+    const zombie = this.element
+
     const angle = Math.atan2(player.position.y - zombie.position.y, player.position.x - zombie.position.x)
 
     // Calculate the movement vector
@@ -86,9 +91,9 @@ export class Zombie {
     let dy = Math.sin(angle)
 
     zombies.forEach(otherZombie => {
-      if (otherZombie !== zombie) {
-        if (this.checkCollision(zombie, otherZombie)) {
-          const avoidAngle = Math.atan2(zombie.position.y - otherZombie.position.y, zombie.position.x - otherZombie.position.x)
+      if (otherZombie.element !== zombie) {
+        if (this.checkCollision(zombie, otherZombie.element)) {
+          const avoidAngle = Math.atan2(zombie.position.y - otherZombie.element.position.y, zombie.position.x - otherZombie.element.position.x)
           dx += Math.cos(avoidAngle)
           dy += Math.sin(avoidAngle)
         }
@@ -106,5 +111,23 @@ export class Zombie {
       zombie.position.x += dx * 5
       zombie.position.y += dy * 5
     }
+
+    // Killing zombies
+    const bullets = player.shooting.bullets
+
+    bullets.forEach(bullet => {
+      const b = bullet.bullet
+      for (let indx = zombies.length - 1; indx >= 0; indx--) {
+        const z = zombies[indx]
+        const dx = z.element.position.x - b.position.x
+        const dy = z.element.position.y - b.position.y
+        const distance = Math.sqrt(dx * dx + dy * dy)
+
+        if (distance <= bullet.params.bulletRadius + this.params.enemyRadius) {
+          zombies.splice(indx, 1)
+          z.destroy() // Destroy the specific zombie
+        }
+      }
+    })
   }
 }
