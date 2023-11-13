@@ -22,7 +22,8 @@ export class Bullet {
     this.params = { bulletSpeed: params.bulletSpeed ?? DEFAULT_BULLET_SPEED, bulletRadius: params.bulletRadius ?? DEFAULT_BULLET_RADIUS }
 
     const cursorPosition = this.app.renderer.events.pointer.global
-    const angle = Math.atan2(cursorPosition.y - this.player.position.y, cursorPosition.x - this.player.position.x) + Math.PI / 2
+    const angle = Math.atan2(cursorPosition.y - this.player.position.y, cursorPosition.x - this.player.position.x)
+
     this.velocity = new PIXI.Point(Math.cos(angle), Math.sin(angle))
 
     this.bullet = this.createBullet()
