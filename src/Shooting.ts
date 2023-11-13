@@ -36,7 +36,24 @@ export class Shooting {
     }
   }
 
+  bulletWentOfScreen = (bullet: Bullet): boolean => {
+    const bulletPosition = bullet.bullet.position
+
+    return (
+      bulletPosition.x <= 0 ||
+      bulletPosition.y <= 0 ||
+      bulletPosition.y >= this.app.view.height ||
+      bulletPosition.x >= this.app.view.width
+    )
+  }
+
   update = (): void => {
-    this.bullets.forEach(b => { b.update() })
+    this.bullets.forEach(b => {
+      b.update()
+      if (this.bulletWentOfScreen(b)) {
+        this.bullets = this.bullets.filter(f => f !== b)
+        b.destroy()
+      }
+    })
   }
 }

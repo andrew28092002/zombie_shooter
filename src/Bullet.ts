@@ -40,6 +40,10 @@ export class Bullet {
     return bullet
   }
 
+  destroy = (): void => {
+    this.bullet.destroy()
+  }
+
   update = (): void => {
     this.bullet.position.x += this.velocity.x * this.params.bulletSpeed
     this.bullet.position.y += this.velocity.y * this.params.bulletSpeed
