@@ -15,7 +15,8 @@ export class Shooting {
   player: Player
   params: Required<ShootingParams>
   bullets: Bullet[] = []
-  cooldown: number = 0
+  fireTimeout?: NodeJS.Timeout
+  canFire = true
 
   constructor (app: PIXI.Application<HTMLCanvasElement>, player: Player, params: Partial<ShootingParams>) {
     this.app = app
@@ -24,24 +25,18 @@ export class Shooting {
   }
 
   fire = (): void => {
-    if (this.bullets.length < this.params.maxBullets) {
-      const bullet = new Bullet(this.app, this.player, {})
-      this.bullets.push(bullet)
-    }
-  }
+    if (this.canFire) {
+      if (this.bullets.length < this.params.maxBullets) {
+        const bullet = new Bullet(this.app, this.player, {})
+        this.bullets.push(bullet)
+        this.canFire = false
 
-  // eslint-disable-next-line
-  set shoot (shooting: boolean) {
-    if (shooting && this.cooldown <= 0) {
-      this.fire()
-      this.cooldown = this.params.bulletsTimeout
+        this.fireTimeout = setTimeout(() => { this.canFire = true }, this.params.bulletsTimeout)
+      }
     }
   }
 
   update = (): void => {
-    if (this.cooldown > 0) {
-      this.cooldown -= this.app.ticker.elapsedMS
-    }
     this.bullets.forEach(b => { b.update() })
   }
 }

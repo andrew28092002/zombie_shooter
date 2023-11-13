@@ -6,7 +6,7 @@ export interface BulletParams {
   bulletRadius: number
 }
 
-const DEFAULT_BULLET_SPEED = 5
+const DEFAULT_BULLET_SPEED = 25
 const DEFAULT_BULLET_RADIUS = 8
 
 export class Bullet {

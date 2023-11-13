@@ -6,7 +6,7 @@ export class Player {
   player: PIXI.Sprite
   shooting: Shooting
   speed: number
-  lastMouseButton = 0
+  leftMouseButtonDown = false
 
   get position (): PIXI.ObservablePoint<any> {
     return this.player.position
@@ -18,6 +18,21 @@ export class Player {
     this.shooting = new Shooting(this.app, this, {})
 
     app.stage.addChild(this.player)
+
+    window.addEventListener('mousedown', this.handleMouseDown)
+    window.addEventListener('mouseup', this.handleMouseUp)
+  }
+
+  handleMouseDown = (event: MouseEvent): void => {
+    if (event.button === 0) {
+      this.leftMouseButtonDown = true
+    }
+  }
+
+  handleMouseUp = (event: MouseEvent): void => {
+    if (event.button === 0) {
+      this.leftMouseButtonDown = false
+    }
   }
 
   initPlayer = (): PIXI.Sprite => {
@@ -33,9 +48,8 @@ export class Player {
     const mouse = this.app.renderer.events.pointer
     const cursorPosition = mouse.global
 
-    if (mouse.buttons !== this.lastMouseButton) {
-      this.shooting.shoot = mouse.buttons !== 0
-      this.lastMouseButton = mouse.buttons
+    if (this.leftMouseButtonDown) {
+      this.shooting.fire()
     }
     this.shooting.update()
 
