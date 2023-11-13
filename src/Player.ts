@@ -1,9 +1,12 @@
 import { type Application } from 'pixi.js'
 import * as PIXI from 'pixi.js'
+import { Shooting } from './Shooting'
 
 export class Player {
   player: PIXI.Sprite
+  shooting: Shooting
   speed: number
+  lastMouseButton = 0
 
   get position (): PIXI.ObservablePoint<any> {
     return this.player.position
@@ -12,6 +15,7 @@ export class Player {
   constructor (public app: Application<HTMLCanvasElement>, public keys: Record<string, boolean>, speed: number = 5) {
     this.player = this.initPlayer()
     this.speed = speed
+    this.shooting = new Shooting(this.app, this, {})
 
     app.stage.addChild(this.player)
   }
@@ -26,7 +30,14 @@ export class Player {
   }
 
   update = (): void => {
-    const cursorPosition = this.app.renderer.events.pointer.global
+    const mouse = this.app.renderer.events.pointer
+    const cursorPosition = mouse.global
+
+    if (mouse.buttons !== this.lastMouseButton) {
+      this.shooting.shoot = mouse.buttons !== 0
+      this.lastMouseButton = mouse.buttons
+    }
+    this.shooting.update()
 
     const angle = Math.atan2(cursorPosition.y - this.player.position.y, cursorPosition.x - this.player.position.x) + Math.PI / 2
 
